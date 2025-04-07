@@ -127,13 +127,11 @@
 		{/each}
 	</div>
 
-	<!-- 如果沒有工具顯示提示 -->
 	{#if activeTools.length === 0}
 		<div
 			class="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-8 text-center dark:border-gray-700 dark:bg-gray-800"
 		>
-			<div class="mb-2 text-3xl">🧰</div>
-			<h3 class="mb-2 text-lg font-medium text-gray-700 dark:text-gray-300">沒有激活的工具</h3>
+			<h3 class="mb-2 text-lg font-medium text-gray-700 dark:text-gray-300">沒有啟用的工具</h3>
 			<p class="mb-4 text-gray-500 dark:text-gray-400">點擊上方的「管理工具」按鈕添加一些工具</p>
 			<button
 				on:click={showToolsSelector}

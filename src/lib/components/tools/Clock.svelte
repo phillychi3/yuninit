@@ -1,33 +1,28 @@
-<script>
+<script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 
 	let date = new Date();
-	let timeFormat = '24'; // '12' or '24'
+	let timeFormat = '24';
 	let showSeconds = true;
-	let timer;
+	let timer: number | undefined;
 
-	// 更新時間
 	function updateTime() {
 		date = new Date();
 	}
 
-	// 切換時間格式
 	function toggleTimeFormat() {
 		timeFormat = timeFormat === '24' ? '12' : '24';
 	}
 
-	// 切換顯示秒數
 	function toggleShowSeconds() {
 		showSeconds = !showSeconds;
 	}
 
-	// 格式化為兩位數
-	function pad(num) {
+	function pad(num: { toString: () => string }) {
 		return num.toString().padStart(2, '0');
 	}
 
-	// 格式化時間
-	function formatTime(date) {
+	function formatTime(date: Date) {
 		let hours = date.getHours();
 		const minutes = pad(date.getMinutes());
 		const seconds = pad(date.getSeconds());
@@ -36,7 +31,7 @@
 		if (timeFormat === '12') {
 			ampm = hours >= 12 ? ' PM' : ' AM';
 			hours = hours % 12;
-			hours = hours ? hours : 12; // 0 應顯示為 12
+			hours = hours ? hours : 12;
 		}
 
 		const hoursStr = pad(hours);
@@ -46,9 +41,8 @@
 			: `${hoursStr}:${minutes}${ampm}`;
 	}
 
-	// 獲取日期字符串
-	function getDateString(date) {
-		const options = {
+	function getDateString(date: Date) {
+		const options: Intl.DateTimeFormatOptions = {
 			weekday: 'long',
 			year: 'numeric',
 			month: 'long',
@@ -59,12 +53,10 @@
 	}
 
 	onMount(() => {
-		// 每秒更新時間
 		timer = setInterval(updateTime, 1000);
 	});
 
 	onDestroy(() => {
-		// 清除定時器
 		if (timer) clearInterval(timer);
 	});
 </script>

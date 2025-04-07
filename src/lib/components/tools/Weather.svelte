@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import { getFromStorage, saveToStorage } from '$lib/utils/storage';
 
@@ -12,52 +12,85 @@
 	};
 
 	let loading = true;
-	let error = null;
-	let lastUpdated = null;
+	let error: null = null;
+	let lastUpdated: Date | null = null;
 
-	// 天氣條件至圖標的映射
-	const weatherIcons = {
-		clear: '☀️',
-		sunny: '☀️',
-		'partly cloudy': '⛅',
-		cloudy: '☁️',
-		overcast: '☁️',
-		rain: '🌧️',
-		shower: '🌧️',
-		thunderstorm: '⛈️',
-		snow: '❄️',
-		mist: '🌫️',
-		fog: '🌫️'
+	const weatherIcons: { [key: number]: string } = {
+		0: '☀️',
+		1: '🌤️',
+		2: '⛅',
+		3: '☁️',
+		45: '🌫️',
+		48: '🌫️',
+		51: '🌦️',
+		53: '🌦️',
+		55: '🌦️',
+		56: '🌨️',
+		57: '🌨️',
+		61: '🌧️',
+		63: '🌧️',
+		65: '🌧️',
+		66: '�️',
+		67: '🌨️',
+		71: '❄️',
+		73: '❄️',
+		75: '❄️',
+		77: '❄️',
+		80: '🌦️',
+		81: '🌦️',
+		82: '🌦️',
+		85: '�️',
+		86: '🌨️',
+		95: '⛈️',
+		96: '⛈️',
+		99: '⛈️'
 	};
 
-	// 根據天氣狀況選擇適當的圖標
-	function getWeatherIcon(condition) {
-		if (!condition) return '🌤️';
-
-		condition = condition.toLowerCase();
-
-		for (const [key, icon] of Object.entries(weatherIcons)) {
-			if (condition.includes(key)) {
-				return icon;
-			}
-		}
-
-		return '🌤️'; // 默認圖標
+	function getWeatherIcon(code: number) {
+		return weatherIcons[code] || '�️';
 	}
 
-	// 獲取用戶位置
+	async function getLocationName(lat: number, lon: number): Promise<string> {
+		try {
+			const response = await fetch(
+				`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=14&addressdetails=1`,
+				{
+					headers: {
+						'User-Agent': 'YunInit Weather App'
+					}
+				}
+			);
+
+			if (!response.ok) {
+				console.error('無法獲取位置名稱');
+				return '當前位置';
+			}
+
+			const data = await response.json();
+			const city =
+				data.address.city ||
+				data.address.town ||
+				data.address.village ||
+				data.address.district ||
+				data.address.county ||
+				'當前位置';
+
+			return city;
+		} catch (error) {
+			console.error('獲取位置名稱時出錯:', error);
+			return '當前位置';
+		}
+	}
+
 	async function getUserLocation() {
 		return new Promise((resolve, reject) => {
-			// 首先嘗試從本地存儲獲取
 			const savedLocation = getFromStorage('userLocation');
 
 			if (savedLocation && savedLocation.timestamp > Date.now() - 24 * 60 * 60 * 1000) {
-				// 如果保存的位置不超過24小時
 				resolve(savedLocation);
 				return;
 			}
 
-			// 否則嘗試獲取新位置
 			if (navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(
 					(position) => {
@@ -81,49 +114,82 @@
 		});
 	}
 
-	// 獲取天氣數據
-	async function fetchWeatherData() {
+	function getWeatherCondition(code: number) {
+		const weatherCodes: { [key: number]: string } = {
+			0: '晴天',
+			1: '晴時多雲',
+			2: '多雲',
+			3: '陰天',
+			45: '霧',
+			48: '霧凇',
+			51: '毛毛雨',
+			53: '小雨',
+			55: '大雨',
+			56: '凍雨',
+			57: '凍雨',
+			61: '小雨',
+			63: '中雨',
+			65: '大雨',
+			66: '凍雨',
+			67: '凍雨',
+			71: '小雪',
+			73: '中雪',
+			75: '大雪',
+			77: '細雪',
+			80: '陣雨',
+			81: '陣雨',
+			82: '暴雨',
+			85: '陣雪',
+			86: '陣雪',
+			95: '雷雨',
+			96: '雷雨伴隨冰雹',
+			99: '雷雨伴隨冰雹'
+		};
+
+		return weatherCodes[code] || '未知天氣';
+	}
+
+	// 修改 fetchWeatherData 函數
+	async function fetchWeatherData(focus = false) {
 		loading = true;
 		error = null;
 
 		try {
-			// 檢查緩存的天氣數據
 			const cachedWeather = getFromStorage('weatherData');
-			if (cachedWeather && cachedWeather.timestamp > Date.now() - 30 * 60 * 1000) {
-				// 如果緩存的數據不超過30分鐘，則使用它
+			if (cachedWeather && cachedWeather.timestamp > Date.now() - 30 * 60 * 1000 && !focus) {
 				weather = cachedWeather.data;
 				lastUpdated = new Date(cachedWeather.timestamp);
 				loading = false;
 				return;
 			}
 
-			// 獲取用戶位置
 			const location = await getUserLocation();
 
-			// 在實際應用中，這裡會調用真實的天氣 API
-			// 這裡僅作演示，使用模擬數據
+			const url = `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`;
 
-			// 模擬 API 請求延遲
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			const response = await fetch(url);
+			if (!response.ok) {
+				throw new Error('無法從 Open-Meteo 獲取天氣數據');
+			}
 
-			// 模擬天氣數據
+			const data = await response.json();
+
+			const cityName = await getLocationName(location.latitude, location.longitude);
+
+			const weatherCode = data.current.weather_code;
+			const weatherCondition = getWeatherCondition(weatherCode);
+
 			const weatherData = {
-				temp: Math.floor(Math.random() * 15) + 15, // 15-30 度
-				condition: ['晴天', '多雲', '陰天', '小雨'][Math.floor(Math.random() * 4)],
-				city: '台北市',
-				humidity: Math.floor(Math.random() * 40) + 40, // 40-80% 濕度
-				windSpeed: Math.floor(Math.random() * 20) + 5 // 5-25 km/h 風速
+				temp: Math.round(data.current.temperature_2m),
+				condition: weatherCondition,
+				city: cityName,
+				humidity: Math.round(data.current.relative_humidity_2m),
+				windSpeed: Math.round(data.current.wind_speed_10m),
+				icon: getWeatherIcon(weatherCode)
 			};
 
-			// 更新天氣數據
-			weather = {
-				...weatherData,
-				icon: getWeatherIcon(weatherData.condition)
-			};
-
-			// 緩存天氣數據
 			saveToStorage('weatherData', {
-				data: weather,
+				data: weatherData,
 				timestamp: Date.now()
 			});
 
@@ -145,7 +211,7 @@
 	<div class="flex items-center justify-between bg-blue-50 p-4 dark:bg-blue-900">
 		<h3 class="text-lg font-medium text-blue-800 dark:text-blue-100">天氣資訊</h3>
 		<button
-			on:click={fetchWeatherData}
+			on:click={() => fetchWeatherData(true)}
 			class="text-blue-500 transition-colors hover:text-blue-700 dark:text-blue-300 dark:hover:text-blue-100"
 			aria-label="重新整理天氣資訊"
 			title="重新整理天氣資訊"
@@ -178,7 +244,7 @@
 			<div class="rounded-md bg-red-100 p-3 text-sm text-red-700 dark:bg-red-900 dark:text-red-100">
 				<p>{error}</p>
 				<button
-					on:click={fetchWeatherData}
+					on:click={() => fetchWeatherData(true)}
 					class="mt-2 text-xs text-red-600 underline hover:text-red-800 dark:text-red-300 dark:hover:text-red-100"
 				>
 					重新嘗試
