@@ -16,6 +16,7 @@
 	let suggestionsEnabled = true;
 	let searchBarRef: HTMLInputElement;
 	let searchEngineDropdownOpen = false;
+	let suggestionTimer: ReturnType<typeof setTimeout>;
 
 	function selectSuggestion(index: number): void {
 		if (index >= 0 && index < suggestions.length) {
@@ -82,32 +83,14 @@
 			return;
 		}
 
-		// 獲取當前搜索引擎配置
-		const engine = searchEngineStore.getEngineConfig();
-
-		// 如果沒有建議 URL，則不顯示建議
-		if (!engine.suggestionUrl) {
-			suggestions = [];
-			showSuggestions = false;
-			return;
-		}
+		//TODO: 編寫api
+		suggestions = [];
+		showSuggestions = false;
+		return;
 
 		try {
-			// 實際應用中，這裡會調用真實的 API
-			// 這裡僅作演示，使用模擬數據
-
-			// 模擬 API 請求延遲
-			await new Promise((resolve) => setTimeout(resolve, 300));
-
-			// 模擬建議數據
 			if (searchQuery.length > 0) {
-				const mockSuggestions: Suggestion[] = [
-					`${searchQuery} 教學`,
-					`${searchQuery} 範例`,
-					`${searchQuery} 下載`,
-					`${searchQuery} 最新版本`,
-					`${searchQuery} 安裝指南`
-				];
+				const mockSuggestions: Suggestion[] = [`${searchQuery} 教學`];
 
 				suggestions = mockSuggestions;
 				showSuggestions = suggestions.length > 0;
@@ -121,12 +104,11 @@
 			showSuggestions = false;
 		}
 	}
-
 	function handleSearchInput(): void {
 		selectedIndex = -1;
 
-		clearTimeout(window.suggestionTimer);
-		window.suggestionTimer = setTimeout(fetchSuggestions, 300);
+		clearTimeout(suggestionTimer);
+		suggestionTimer = setTimeout(fetchSuggestions, 300);
 	}
 
 	function handleKeydown(event: KeyboardEvent): void {
@@ -198,7 +180,9 @@
 					class="flex items-center text-gray-600 hover:text-gray-800 focus:outline-none dark:text-gray-300 dark:hover:text-gray-100"
 					aria-label="選擇搜索引擎"
 				>
-					<span class="mr-1 text-xl">{currentEngine.icon}</span>
+					<span class="mr-1 text-xl">
+						<img src={currentEngine.icon} alt={currentEngine.name} class="h-5 w-5" loading="lazy" />
+					</span>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						class="h-4 w-4"
@@ -223,7 +207,9 @@
 								on:click={() => selectSearchEngine(engine.id)}
 								class="flex w-full items-center px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
 							>
-								<span class="mr-2 text-xl">{engine.icon}</span>
+								<span class="mr-2 text-xl">
+									<img src={engine.icon} alt={engine.name} class="h-5 w-5" loading="lazy" />
+								</span>
 								<span>{engine.name}</span>
 								{#if engine.id === currentEngine.id}
 									<svg

@@ -7,7 +7,6 @@ export interface SearchEngine {
 	name: string;
 	url: string;
 	icon: string;
-	suggestionUrl: string;
 }
 
 export const searchEngines: SearchEngine[] = [
@@ -15,36 +14,31 @@ export const searchEngines: SearchEngine[] = [
 		id: 'google',
 		name: 'Google',
 		url: 'https://www.google.com/search?q=',
-		icon: '🔍',
-		suggestionUrl: 'https://suggestqueries.google.com/complete/search?client=firefox&q='
+		icon: '/search/google.svg'
 	},
 	{
 		id: 'bing',
 		name: 'Bing',
 		url: 'https://www.bing.com/search?q=',
-		icon: '🔎',
-		suggestionUrl: 'https://api.bing.com/osjson.aspx?query='
+		icon: '/search/bing.svg'
 	},
 	{
 		id: 'duckduckgo',
 		name: 'DuckDuckGo',
 		url: 'https://duckduckgo.com/?q=',
-		icon: '🦆',
-		suggestionUrl: ''
+		icon: '/search/duckduckgo.svg'
 	},
 	{
 		id: 'yahoo',
 		name: 'Yahoo',
 		url: 'https://search.yahoo.com/search?p=',
-		icon: '🔱',
-		suggestionUrl: 'https://search.yahoo.com/sugg/gossip/gossip-us-ura/?command='
+		icon: '/search/yahoo.svg'
 	},
 	{
 		id: 'baidu',
 		name: 'Baidu',
 		url: 'https://www.baidu.com/s?wd=',
-		icon: '🔵',
-		suggestionUrl: 'https://suggestion.baidu.com/su?wd='
+		icon: '/search/baidu.svg'
 	}
 ];
 
