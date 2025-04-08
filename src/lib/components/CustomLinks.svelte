@@ -132,7 +132,7 @@
 			on:click={() => {
 				isEditing = false;
 				editIndex = -1;
-				newLink = { title: '', url: '', icon: '🔗' };
+				newLink = { title: '', url: '' };
 				showAddForm = true;
 			}}
 			class="flex h-24 flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white p-4 transition-colors duration-300 hover:border-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-500"

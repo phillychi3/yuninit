@@ -1,11 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import {
-		searchEngineStore,
-		searchEngines,
-		type SearchEngine
-	} from '$lib/stores/searchEngineStore';
+	import { searchEngineStore, searchEngines } from '$lib/stores/searchEngineStore';
 	import { getFromStorage } from '$lib/utils/storage';
+	import { browser } from '$app/environment';
 
 	type Suggestion = string;
 
@@ -17,6 +14,7 @@
 	let searchBarRef: HTMLInputElement;
 	let searchEngineDropdownOpen = false;
 	let suggestionTimer: ReturnType<typeof setTimeout>;
+	const searchApiurl = 'https://wsearch.cloudowo.com/search';
 
 	function selectSuggestion(index: number): void {
 		if (index >= 0 && index < suggestions.length) {
@@ -83,16 +81,24 @@
 			return;
 		}
 
-		//TODO: 編寫api
-		suggestions = [];
-		showSuggestions = false;
-		return;
+		const langcode = browser ? navigator.language : 'zh-TW';
+
+		const url = `${searchApiurl}?q=${encodeURIComponent(searchQuery)}&lang=${langcode}`;
 
 		try {
-			if (searchQuery.length > 0) {
-				const mockSuggestions: Suggestion[] = [`${searchQuery} 教學`];
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
 
-				suggestions = mockSuggestions;
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			const data = await response.json();
+			if (data && data.suggestions) {
+				suggestions = data.suggestions;
 				showSuggestions = suggestions.length > 0;
 			} else {
 				suggestions = [];
