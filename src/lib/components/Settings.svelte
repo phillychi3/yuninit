@@ -158,7 +158,7 @@
 						<div class="flex justify-between pt-4">
 							<Button variant="outline" on:click={resetSettings} type="button">重置設置</Button>
 
-							<Button variant="primary" type="submit">保存設置</Button>
+							<Button variant="primary" type="submit">儲存設置</Button>
 						</div>
 					</form>
 				</div>

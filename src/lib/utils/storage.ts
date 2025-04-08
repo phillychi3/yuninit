@@ -8,7 +8,7 @@ export function saveToStorage<T>(key: string, value: T) {
 		localStorage.setItem(key, serialized);
 		return true;
 	} catch (error) {
-		console.error('保存到本地存儲失敗:', error);
+		console.error('儲存到本地存儲失敗:', error);
 		return false;
 	}
 }

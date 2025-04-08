@@ -72,7 +72,6 @@
 		<div class="w-full px-4 pb-16" in:fade={{ duration: 300, delay: 100 }}>
 			<div class="mx-auto max-w-4xl">
 				<div class="mb-8" in:slide={{ duration: 300, delay: 200 }}>
-					<h2 class="mb-4 text-xl font-bold text-gray-800 dark:text-gray-200">我的快速連結</h2>
 					<CustomLinks />
 				</div>
 				<div in:slide={{ duration: 300, delay: 300 }}>

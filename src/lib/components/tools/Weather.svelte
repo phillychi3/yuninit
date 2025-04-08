@@ -149,7 +149,6 @@
 		return weatherCodes[code] || '未知天氣';
 	}
 
-	// 修改 fetchWeatherData 函數
 	async function fetchWeatherData(focus = false) {
 		loading = true;
 		error = null;

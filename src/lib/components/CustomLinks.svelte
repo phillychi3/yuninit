@@ -2,33 +2,17 @@
 	import { onMount } from 'svelte';
 
 	let links = [
-		{ title: 'Google', url: 'https://www.google.com', icon: '🔍' },
-		{ title: 'Gmail', url: 'https://mail.google.com', icon: '✉️' },
-		{ title: 'YouTube', url: 'https://www.youtube.com', icon: '▶️' },
-		{ title: 'Maps', url: 'https://maps.google.com', icon: '🗺️' }
+		{ title: 'Google', url: 'https://www.google.com' },
+		{ title: 'Gmail', url: 'https://mail.google.com' },
+		{ title: 'YouTube', url: 'https://www.youtube.com' },
+		{ title: 'Maps', url: 'https://maps.google.com' }
 	];
 
 	let showAddForm = false;
-	let newLink = { title: '', url: '', icon: '🔗' };
+	let newLink = { title: '', url: '' };
 	let isEditing = false;
 	let editIndex = -1;
-
-	const availableIcons = [
-		'🔍',
-		'✉️',
-		'▶️',
-		'🗺️',
-		'🔗',
-		'📝',
-		'📚',
-		'💼',
-		'🎮',
-		'🎬',
-		'🎵',
-		'📰',
-		'💻',
-		'📱'
-	];
+	const Iconurl = 'https://www.google.com/s2/favicons?domain=';
 
 	onMount(() => {
 		const savedLinks = localStorage.getItem('customLinks');
@@ -36,7 +20,7 @@
 			try {
 				links = JSON.parse(savedLinks);
 			} catch (e) {
-				console.error('無法解析保存的連結:', e);
+				console.error('無法解析儲存的連結:', e);
 			}
 		}
 	});
@@ -61,7 +45,7 @@
 
 			saveLinks();
 
-			newLink = { title: '', url: '', icon: '🔗' };
+			newLink = { title: '', url: '' };
 			showAddForm = false;
 		}
 	}
@@ -81,7 +65,7 @@
 	}
 
 	function cancelEdit() {
-		newLink = { title: '', url: '', icon: '🔗' };
+		newLink = { title: '', url: '' };
 		isEditing = false;
 		editIndex = -1;
 		showAddForm = false;
@@ -96,7 +80,9 @@
 					href={link.url}
 					class="flex h-24 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-sm transition-shadow duration-300 hover:shadow-md dark:bg-gray-800 dark:text-gray-200 dark:shadow-gray-900/30"
 				>
-					<div class="mb-2 text-2xl">{link.icon}</div>
+					<div class="mb-2 text-2xl">
+						<img src={Iconurl + link.url} alt={link.title} class="h-4 w-4 rounded-full" />
+					</div>
 					<div class="w-full truncate text-center text-sm text-gray-700 dark:text-gray-300">
 						{link.title}
 					</div>
@@ -203,27 +189,6 @@
 							class="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
 						/>
 					</div>
-					<div>
-						<label
-							for="icons"
-							class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">圖標</label
-						>
-						<div id="icons" class="grid grid-cols-7 gap-2">
-							{#each availableIcons as icon}
-								<button
-									type="button"
-									on:click={() => (newLink.icon = icon)}
-									class={`flex h-10 w-10 items-center justify-center rounded text-xl ${
-										newLink.icon === icon
-											? 'border-2 border-blue-500 bg-blue-100 dark:border-blue-400 dark:bg-blue-900'
-											: 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600'
-									}`}
-								>
-									{icon}
-								</button>
-							{/each}
-						</div>
-					</div>
 					<div class="mt-6 flex justify-end space-x-3">
 						<button
 							type="button"
@@ -236,7 +201,7 @@
 							type="submit"
 							class="rounded bg-blue-500 px-4 py-2 text-white transition-colors duration-300 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
 						>
-							{isEditing ? '保存' : '添加'}
+							{isEditing ? '儲存' : '添加'}
 						</button>
 					</div>
 				</form>
