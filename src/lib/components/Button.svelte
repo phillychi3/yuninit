@@ -7,6 +7,7 @@
 	export let icon = null;
 	export let iconOnly = false;
 	export let loading = false;
+	export let className = '';
 
 	const variantClasses = {
 		primary:
@@ -37,6 +38,7 @@
       ${iconOnly ? 'p-2' : sizeClasses[size] || sizeClasses.md}
       ${fullWidth ? 'w-full' : ''}
       ${disabled || loading ? 'opacity-60 cursor-not-allowed' : ''}
+	  ${className}
     `;
 </script>
 

@@ -4,11 +4,14 @@
 	import { saveToStorage, getFromStorage } from '$lib/utils/storage';
 
 	let showSettings = false;
+	let showExport = false;
+	let showImport = false;
 	let settings = {
 		theme: 'light',
 		openLinksInNewTab: true,
 		maxLinksPerRow: 5
 	};
+	let settingb64 = '';
 
 	onMount(() => {
 		const savedSettings = getFromStorage('userSettings');
@@ -16,7 +19,17 @@
 			settings = { ...settings, ...savedSettings };
 		}
 		applyTheme(settings.theme);
+
+		addEventListener('keydown', haldelkeydown);
 	});
+
+	function haldelkeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			showSettings = false;
+			showExport = false;
+			showImport = false;
+		}
+	}
 
 	function saveSettings() {
 		saveToStorage('userSettings', settings);
@@ -44,6 +57,29 @@
 			};
 			saveSettings();
 		}
+	}
+
+	function exportSettings() {
+		const exportSettings = {
+			settings: settings,
+			links: getFromStorage('customLinks') || []
+		};
+		console.log(exportSettings);
+		const jsonString = JSON.stringify(exportSettings);
+		settingb64 = btoa(jsonString);
+		showExport = true;
+	}
+
+	function showImportDialog() {
+		showImport = true;
+	}
+
+	function loadSetting() {
+		const decodedString = atob(settingb64);
+		const parsedSettings = JSON.parse(decodedString);
+		settings = { ...settings, ...parsedSettings.settings };
+		saveToStorage('customLinks', parsedSettings.links);
+		saveSettings();
 	}
 </script>
 
@@ -84,7 +120,7 @@
 					<div class="mb-6 flex items-center justify-between">
 						<h2 class="text-xl font-bold dark:text-white">設置</h2>
 						<button
-							on:click={() => (showSettings = false)}
+							on:click={() => ((showSettings = false), (showExport = false))}
 							class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
 							aria-label="關閉設置"
 						>
@@ -155,6 +191,25 @@
 							/>
 						</div>
 
+						<div>
+							<label
+								for="exportSettings"
+								class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+							>
+								導出入設置
+							</label>
+							<Button variant="outline" on:click={exportSettings} type="button">導出</Button>
+							<Button variant="outline" on:click={showImportDialog} type="button">導入</Button>
+						</div>
+						{#if showExport}
+							<textarea
+								id="exportSettings"
+								class="mt-1 h-32 w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+								readonly
+								value={settingb64}
+							></textarea>
+						{/if}
+
 						<div class="flex justify-between pt-4">
 							<Button variant="outline" on:click={resetSettings} type="button">重置設置</Button>
 
@@ -166,3 +221,32 @@
 		</div>
 	{/if}
 </div>
+
+<!-- load setting dialog -->
+{#if showImport}
+	<div class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+		<div
+			class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white shadow-xl dark:bg-gray-800"
+		>
+			<div class="p-6">
+				<h2 class="mb-4 text-xl font-bold dark:text-white">導入設置</h2>
+				<textarea
+					id="importSettings"
+					class="mt-1 h-32 w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+					bind:value={settingb64}
+				></textarea>
+				<div class="flex justify-end pt-4">
+					<Button
+						variant="primary"
+						on:click={() => {
+							showImport = false;
+						}}
+						type="button"
+						className="mr-2">取消</Button
+					>
+					<Button variant="primary" on:click={loadSetting} type="button">導入</Button>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}

@@ -22,6 +22,8 @@
 			} catch (e) {
 				console.error('無法解析儲存的連結:', e);
 			}
+		} else {
+			localStorage.setItem('customLinks', JSON.stringify(links));
 		}
 	});
 
