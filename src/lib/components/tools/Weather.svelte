@@ -2,7 +2,14 @@
 	import { onMount } from 'svelte';
 	import { getFromStorage, saveToStorage } from '$lib/utils/storage';
 
-	let weather = {
+	let weather: {
+		temp: number | null;
+		condition: string;
+		city: string;
+		humidity: number | null;
+		windSpeed: number | null;
+		icon: string;
+	} = {
 		temp: null,
 		condition: '',
 		city: '',
@@ -82,9 +89,15 @@
 		}
 	}
 
-	async function getUserLocation() {
+	interface LocationData {
+		latitude: number;
+		longitude: number;
+		timestamp: number;
+	}
+
+	async function getUserLocation(): Promise<LocationData> {
 		return new Promise((resolve, reject) => {
-			const savedLocation = getFromStorage('userLocation');
+			const savedLocation = getFromStorage('userLocation') as LocationData | null;
 
 			if (savedLocation && savedLocation.timestamp > Date.now() - 24 * 60 * 60 * 1000) {
 				resolve(savedLocation);
@@ -193,6 +206,7 @@
 			});
 
 			lastUpdated = new Date();
+			weather = weatherData;
 		} catch (err) {
 			console.error('獲取天氣數據時出錯:', err);
 			error = err.message || '無法獲取天氣數據';

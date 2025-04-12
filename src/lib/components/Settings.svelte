@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import Button from './Button.svelte';
 	import { saveToStorage, getFromStorage } from '$lib/utils/storage';
+	import { fade, slide } from 'svelte/transition';
 
 	let showSettings = false;
 	let showExport = false;
@@ -112,9 +113,13 @@
 	</button>
 
 	{#if showSettings}
-		<div class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+		<div
+			class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4"
+			in:fade={{ duration: 200 }}
+		>
 			<div
 				class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white shadow-xl dark:bg-gray-800"
+				in:slide={{ duration: 200 }}
 			>
 				<div class="p-6">
 					<div class="mb-6 flex items-center justify-between">

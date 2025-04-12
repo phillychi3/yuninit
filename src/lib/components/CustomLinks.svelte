@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { fade, slide } from 'svelte/transition';
 
 	let links = [
 		{ title: 'Google', url: 'https://www.google.com' },
@@ -160,8 +161,12 @@
 	{#if showAddForm}
 		<div
 			class="bg-opacity-50 dark:bg-opacity-70 fixed inset-0 z-50 flex items-center justify-center bg-black dark:bg-gray-900"
+			in:fade={{ duration: 200 }}
 		>
-			<div class="w-full max-w-md rounded-lg bg-white p-6 dark:bg-gray-800">
+			<div
+				class="w-full max-w-md rounded-lg bg-white p-6 dark:bg-gray-800"
+				in:slide={{ duration: 200 }}
+			>
 				<h2 class="mb-4 text-xl font-bold dark:text-white">
 					{isEditing ? '編輯連結' : '添加新連結'}
 				</h2>
