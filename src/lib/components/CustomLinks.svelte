@@ -3,10 +3,8 @@
 	import { fade, slide } from 'svelte/transition';
 
 	let links = [
-		{ title: 'Google', url: 'https://www.google.com' },
-		{ title: 'Gmail', url: 'https://mail.google.com' },
-		{ title: 'YouTube', url: 'https://www.youtube.com' },
-		{ title: 'Maps', url: 'https://maps.google.com' }
+		{ title: '單一', url: 'https://單.雲.tw' },
+		{ title: '官網', url: 'https://www.yuntech.edu.tw/' }
 	];
 
 	let showAddForm = false;
